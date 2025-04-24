@@ -1,0 +1,45 @@
+#include <stdio.h>
+#include <string.h>
+
+void xor(char *dividend, const char *divisor, int len) {
+    for (int i = 0; i < len; i++) {
+        dividend[i] = (dividend[i] == divisor[i]) ? '0' : '1';
+    }
+}
+
+void crc(char *data, const char *divisor, char *remainder) {
+    int data_len = strlen(data);
+    int divisor_len = strlen(divisor);
+    char temp[50];
+
+    strncpy(temp, data, divisor_len);
+    temp[divisor_len] = '\0';
+
+    for (int i = divisor_len; i <= data_len; i++) {
+        if (temp[0] == '1') {
+            xor(temp, divisor, divisor_len);
+        } else {
+            char zeros[50];
+            for (int j = 0; j < divisor_len; j++) zeros[j] = '0';
+            xor(temp, zeros, divisor_len);
+        }
+
+        if (i != data_len) {
+            memmove(temp, temp + 1, divisor_len - 1);
+            temp[divisor_len - 1] = data[i];
+            temp[divisor_len] = '\0';
+        }
+    }
+    strcpy(remainder, temp + 1);
+}
+
+int main() {
+    char data[] = "1001000000";
+    char divisor[] = "10011";
+    char remainder[50];
+
+    crc(data, divisor, remainder);
+    printf("Remainder: %s\n", remainder);
+
+    return 0;
+}
